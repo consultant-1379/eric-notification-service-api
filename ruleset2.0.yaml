@@ -1,0 +1,26 @@
+modelVersion: 2.0
+description: "Laika: Notification Service API Pipeline"
+docker-images:
+  - maven-builder: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-java11mvnbuilder:latest
+properties:
+  - mvn-settings: settings.xml
+  - mvn-image: armdocker.rnd.ericsson.se/proj-adp-cicd-drop/bob-java11mvnbuilder:latest
+  - mvn-flags: "-B -Duser.home=. -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn"
+rules:
+  clean:
+    - task: mvn-clean
+      docker-image: maven-builder
+      cmd:
+        - mvn -U -s ${mvn-settings} ${mvn-flags} clean
+  compile:
+    - task: mvn-compile
+      docker-image: maven-builder
+      cmd: mvn -s ${mvn-settings} ${mvn-flags} compile
+  test:
+    - task: mvn-test
+      docker-image: maven-builder
+      cmd: mvn -s ${mvn-settings} ${mvn-flags} test
+  deploy:
+    - task: mvn-deploy
+      docker-image: maven-builder
+      cmd: mvn -s ${mvn-settings} ${mvn-flags} deploy
